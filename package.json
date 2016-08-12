@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/ConstantineZarzhytskyy/stripe-test/issues"
   },
-  "homepage": "https://github.com/ConstantineZarzhytskyy/stripe-test#readme"
+  "homepage": "https://github.com/ConstantineZarzhytskyy/stripe-test#readme",
+  "dependencies": {
+    "async": "^2.0.1",
+    "body-parser": "~1.13.2",
+    "cookie-parser": "~1.3.5",
+    "express": "^4.14.0",
+    "stripe": "^4.4.0"
+  }
 }
