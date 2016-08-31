@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 var async = require('async');
 var stripe = require('stripe')('sk_test_eBBR4DkvJFUA4sqw8Vfaja0N');
 
 router.get('/', function (req, res) {
-  res.json('ok');
+  res.sendFile(path.join(__dirname+'/index.html'));
 });
 
 router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (req, res) {
@@ -97,6 +98,19 @@ router.get('/stripe/charges', function (req, res) {
 
 router.post('/stripe/webhooks', function (req, res) {
   res.json({ "webhooks": "ok" });
+})
+
+router.post('/charge', function(req, res) {
+  stripe.charges.create({
+    amount: req.body.paymentDetails.amount,
+    currency: 'usd',
+    source: req.body.token.id,
+    description: req.body.paymentDetails.description
+  }, function(err, charge) {
+    if (err) { res.send(err); }
+
+    res.json(charge);
+  });
 })
 
 module.exports = router;
