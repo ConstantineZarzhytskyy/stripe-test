@@ -106,11 +106,11 @@ router.post('/stripe/webhooks', function (req, res) {
 router.post('/stripe/charge', function(req, res) {
   stripe.charges.create({
     amount: req.body.paymentDetails.amount,
-    currency: 'usd',
+    currency: 'GBP',
     source: req.body.token.id,
     description: req.body.paymentDetails.description
   }, function(err, charge) {
-    if (err) { res.send(err); }
+    if (err) { return res.send(err); }
 
     res.json(charge);
   });

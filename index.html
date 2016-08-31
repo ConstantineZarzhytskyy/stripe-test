@@ -11,7 +11,6 @@
 			<button ng-click="payment($event, item.amount)">pay with stripe</button>			
 			</li>
 		</ui>
-	<button ng-click="payment($event)">pay with stripe</button>
 	<h3>Thx 4 pay!!</h3>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.js"></script>
@@ -33,9 +32,9 @@
 				  token: function (token) {
 				  	AppService.payment(token, paymentDetails)
 					  	.then(function (ok) {
-					  		alert(ok);
+					  		alert('ok');
 					  	}, function (err) {
-					  		alert(err);
+					  		alert('err');
 					  	})
 				  }
 				});
