@@ -12,19 +12,23 @@ router.get('/list', function (req, res) {
   res.json([
     {
       name: 'item 1',
-      amount: 1000
+      amount: 1000,
+      currency: 'usd'
     },
     {
       name: 'item 2',
-      amount: 2000
+      amount: 2000,
+      currency: 'eur'
     },
     {
       name: 'item 3',
-      amount: 3000
+      amount: 3000,
+      currency: 'gbp'
     },
     {
       name: 'item 4',
-      amount: 4000
+      amount: 4000,
+      currency: 'dkk'
     }
   ]);
 });
@@ -106,7 +110,7 @@ router.post('/stripe/webhooks', function (req, res) {
 router.post('/stripe/charge', function(req, res) {
   stripe.charges.create({
     amount: req.body.paymentDetails.amount,
-    currency: 'GBP',
+    currency: req.body.paymentDetails.currency,
     source: req.body.token.id,
     description: req.body.paymentDetails.description
   }, function(err, charge) {

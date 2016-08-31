@@ -8,7 +8,7 @@
 		<ui>
 			<li ng-repeat="item in list">
 			{{ item.name }}
-			<button ng-click="payment($event, item.amount)">pay with stripe</button>			
+			<button ng-click="payment($event, item)">pay with stripe</button>			
 			</li>
 		</ui>
 	<h3>Thx 4 pay!!</h3>
@@ -32,18 +32,21 @@
 				  token: function (token) {
 				  	AppService.payment(token, paymentDetails)
 					  	.then(function (ok) {
-					  		alert('ok');
+					  		alert(ok.status);
 					  	}, function (err) {
 					  		alert('err');
 					  	})
 				  }
 				});
 
-			$scope.payment = function (e, itemAmount) {
+			$scope.payment = function (e, item) {
 				paymentDetails = {
 					name: 'NAME',
 					description: 'DESCRIPTION',
-					amount: itemAmount
+					amount: item.amount,
+					currency: item.currency,
+					shippingAddress: true,
+					billingAddress: true
 				}
 				handler.open(paymentDetails);
 				e.preventDefault();
