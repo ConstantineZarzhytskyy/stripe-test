@@ -8,6 +8,27 @@ router.get('/', function (req, res) {
   res.sendFile(path.join(__dirname+'/index.html'));
 });
 
+router.get('/list', function (req, res) {
+  res.json([
+    {
+      name: 'item 1',
+      amount: 1000
+    },
+    {
+      name: 'item 2',
+      amount: 2000
+    },
+    {
+      name: 'item 3',
+      amount: 3000
+    },
+    {
+      name: 'item 4',
+      amount: 4000
+    }
+  ]);
+});
+
 router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (req, res) {
   var params = {
     email: req.params.email,
@@ -78,29 +99,11 @@ router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (re
   }
 });
 
-router.get('/stripe/charges', function (req, res) {
-  stripe.charges.create({
-    amount: 2000,
-    currency: "usd",
-    source: {
-      number: '4242424242424242',
-      exp_month: 12,
-      exp_year: 2017,
-      cvc: '123'
-    },
-    description: "Charge for addison.white@example.com"
-  }, function(err, charge) {
-    if (err) { res.send(err); }
-
-    res.json(charge);
-  });
-})
-
 router.post('/stripe/webhooks', function (req, res) {
   res.json({ "webhooks": "ok" });
-})
+});
 
-router.post('/charge', function(req, res) {
+router.post('/stripe/charge', function(req, res) {
   stripe.charges.create({
     amount: req.body.paymentDetails.amount,
     currency: 'usd',
@@ -111,6 +114,7 @@ router.post('/charge', function(req, res) {
 
     res.json(charge);
   });
-})
+});
+
 
 module.exports = router;
