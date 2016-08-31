@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 var async = require('async');
 var stripe = require('stripe')('sk_test_eBBR4DkvJFUA4sqw8Vfaja0N');
 
 router.get('/', function (req, res) {
-  res.json('ok');
+  res.sendFile(path.join(__dirname+'/index.html'));
 });
 
 router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (req, res) {
@@ -19,7 +20,6 @@ router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (re
   console.log('params = ', params);
 
   async.waterfall([
-    getToken,
     createCustomer,
     createPlan,
     createSubscribtion
@@ -31,26 +31,16 @@ router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (re
     res.json(done);
   });
 
-  function getToken(callback) {
-    stripe.tokens.create({
-      card: {
-        number: params.cardNumber,
+  function createCustomer(callback) {
+    stripe.customers.create({
+      source: {
+        object: "card",
         exp_month: params.mounth,
         exp_year: params.year,
-        cvc: params.cvc
-      }
-    }, function (err, token) {
-      console.log('token = ', token);
-      if (err) { return callback(err); }
-
-      callback(null, token);
-    });
-  }
-
-  function createCustomer(token, callback) {
-    stripe.customers.create({
-      source: token.id,
+        number: params.cardNumber
+      },
       email: params.email,
+      account_balance: params.amount,
       description: 'Customer ' + params.email + ' is devTest account'
     }, function (err, customer) {
       console.log('customer = ', customer);
@@ -62,11 +52,11 @@ router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (re
 
   function createPlan(customer, callback) {
     stripe.plans.create({
-      amount: 200,
+      amount: 100,
       interval: 'day',
-      name: '7$ 2',
+      name: '1$',
       currency: 'usd',
-      id: '7$ 2'
+      id: '1$'
     }, function (err, plan) {
       console.log('plan = ', plan);
       if (err) { return callback(err); }
@@ -87,5 +77,40 @@ router.get('/stripe/:email/:cardNumber/:mounth/:year/:cvc/:amount', function (re
     });
   }
 });
+
+router.get('/stripe/charges', function (req, res) {
+  stripe.charges.create({
+    amount: 2000,
+    currency: "usd",
+    source: {
+      number: '4242424242424242',
+      exp_month: 12,
+      exp_year: 2017,
+      cvc: '123'
+    },
+    description: "Charge for addison.white@example.com"
+  }, function(err, charge) {
+    if (err) { res.send(err); }
+
+    res.json(charge);
+  });
+})
+
+router.post('/stripe/webhooks', function (req, res) {
+  res.json({ "webhooks": "ok" });
+})
+
+router.post('/charge', function(req, res) {
+  stripe.charges.create({
+    amount: req.body.paymentDetails.amount,
+    currency: 'usd',
+    source: req.body.token.id,
+    description: req.body.paymentDetails.description
+  }, function(err, charge) {
+    if (err) { res.send(err); }
+
+    res.json(charge);
+  });
+})
 
 module.exports = router;
