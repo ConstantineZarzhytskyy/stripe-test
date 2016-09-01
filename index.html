@@ -17,7 +17,7 @@
 	<script src="https://checkout.stripe.com/checkout.js"></script>
 	<script>
 		angular.module('stripeApp', [])
-		.controller('AppController', ['$scope', 'AppService',function ($scope, AppService) {
+		.controller('AppController', ['$scope', '$window', 'AppService',function ($scope, $window, AppService) {
 			AppService.getList()
 				.then(function (ok) {
 					$scope.list = ok;
@@ -52,7 +52,7 @@
 				e.preventDefault();
 			};
 
-			window.onpopstate = function (event) {
+			$window.onpopstate = function (event) {
 				handler.close();
 			}
 			
