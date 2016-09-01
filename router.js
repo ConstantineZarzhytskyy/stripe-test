@@ -108,16 +108,38 @@ router.post('/stripe/webhooks', function (req, res) {
 });
 
 router.post('/stripe/charge', function(req, res) {
-  stripe.charges.create({
-    amount: req.body.paymentDetails.amount,
-    currency: req.body.paymentDetails.currency,
-    source: req.body.token.id,
-    description: req.body.paymentDetails.description
-  }, function(err, charge) {
+  async.waterfall([
+      createCustomer,
+      createCharges
+  ], function (err, done) {
     if (err) { return res.send(err); }
 
-    res.json(charge);
+    res.json(done);
   });
+
+  function createCustomer(callback) {
+    stripe.customers.create({
+      source: req.body.token.id,
+      description: req.body.paymentDetails.description,
+      email: req.body.token.email
+    }, function (err, customer) {
+      if (err) { return callback(err); }
+
+      callback(null, customer);
+    });
+  }
+
+  function createCharges(customer, callback) {
+    stripe.charges.create({
+      amount: req.body.paymentDetails.amount,
+      currency: req.body.paymentDetails.currency,
+      customer: customer.id
+    }, function (err, charge) {
+      if (err) { return callback(err); }
+
+      callback(null, charge);
+    })
+  }
 });
 
 
